@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class CustomElevatedBtn extends StatelessWidget {
   final String text;
-  final Function onPressed;
+  final Function? onPressed;
   const CustomElevatedBtn({super.key, required this.text, required this.onPressed});
 
   @override
@@ -13,7 +13,9 @@ class CustomElevatedBtn extends StatelessWidget {
         shape: const StadiumBorder(),
         elevation: 2,
       ),
-      onPressed: () => onPressed(),
+      //Esto es para que el boton se ponga gris cuando esta autenticando
+      //ya que el null safety me obliga a hacerlo asi.
+      onPressed: onPressed!=null ? () => onPressed!() : null,
       child: SizedBox(
           width: double.infinity,
           height: 40,

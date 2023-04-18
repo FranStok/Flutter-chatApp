@@ -1,7 +1,11 @@
-import 'package:chat/widgets/custom_elevated_btn.dart';
-import 'package:chat/widgets/custom_inputs.dart';
+import 'package:chat/alertas/alertas.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import 'package:chat/providers/auth_provider.dart';
+
+import 'package:chat/widgets/custom_inputs.dart';
+import 'package:chat/widgets/custom_elevated_btn.dart';
 import '../widgets/custom_labels.dart';
 import '../widgets/custom_logo.dart';
 
@@ -16,14 +20,14 @@ class LoginPage extends StatelessWidget {
         body: SafeArea(
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            child: Container(
-              height: MediaQuery.of(context).size.height*0.9,
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height * 0.9,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: const [
                   Logo(titulo: "Messenger"),
                   _Form(),
-                  Labels(route:"register"),
+                  Labels(route: "register"),
                   Text("Terminos y condiciones de uso",
                       style: TextStyle(fontWeight: FontWeight.w200)),
                 ],
@@ -46,6 +50,7 @@ class __FormState extends State<_Form> {
   final passwordCtrl = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -65,10 +70,22 @@ class __FormState extends State<_Form> {
           ),
           CustomElevatedBtn(
               text: "Login",
-              onPressed: () {
-                print(emailCtrl.text);
-                print(passwordCtrl.text);
-              })
+              onPressed: (!authProvider.autenticando)
+                  ? () async {
+                      //Elimina el focus del teclaro cuando mandamos.
+                      FocusScope.of(context).unfocus();
+                      final loginOk = await authProvider.login(
+                          emailCtrl.text.trim(), passwordCtrl.text.trim());
+                      if (loginOk) {
+                        //Conectar al socket Server
+                        Navigator.pushReplacementNamed(context, "usuarios");
+                      } else {
+                        alertaCredenciales(
+                            context, "Login incorrecto", "Revise credenciales");
+                      }
+                    }
+                  : null
+          )
         ],
       ),
     );

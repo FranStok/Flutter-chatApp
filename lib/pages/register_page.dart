@@ -1,7 +1,10 @@
+import 'package:chat/alertas/alertas.dart';
 import 'package:chat/widgets/custom_elevated_btn.dart';
 import 'package:chat/widgets/custom_inputs.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/auth_provider.dart';
 import '../widgets/custom_labels.dart';
 import '../widgets/custom_logo.dart';
 
@@ -47,6 +50,7 @@ class __FormState extends State<_Form> {
   final passwordCtrl = TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -70,11 +74,23 @@ class __FormState extends State<_Form> {
             controller: passwordCtrl,
           ),
           CustomElevatedBtn(
-              text: "Login",
-              onPressed: () {
-                print(emailCtrl.text);
-                print(passwordCtrl.text);
-              })
+              text: "Crear cuenta",
+              onPressed: (!authProvider.autenticando)
+                  ? () async {
+                      //Elimina el focus del teclaro cuando mandamos.
+                      FocusScope.of(context).unfocus();
+                      final registerOk = await authProvider.register(
+                         nameCtrl.text.trim(), emailCtrl.text.trim(), passwordCtrl.text.trim());
+                      if (registerOk==true) {
+                        //Conectar al socket Server
+                        Navigator.pushReplacementNamed(context, "usuarios");
+                      } else {
+                        alertaCredenciales(
+                            context, "${registerOk}", "Revise credenciales");
+                      }
+                    }
+                  : null
+          )
         ],
       ),
     );

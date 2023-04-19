@@ -1,12 +1,15 @@
-import 'package:chat/alertas/alertas.dart';
-import 'package:chat/widgets/custom_elevated_btn.dart';
-import 'package:chat/widgets/custom_inputs.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth_provider.dart';
+import '../providers/socket_provider.dart';
+
+import 'package:chat/alertas/alertas.dart';
+
 import '../widgets/custom_labels.dart';
 import '../widgets/custom_logo.dart';
+import 'package:chat/widgets/custom_elevated_btn.dart';
+import 'package:chat/widgets/custom_inputs.dart';
 
 class RegisterPage extends StatelessWidget {
   @override
@@ -20,13 +23,13 @@ class RegisterPage extends StatelessWidget {
           child: SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
             child: Container(
-              height: MediaQuery.of(context).size.height*0.9,
+              height: MediaQuery.of(context).size.height * 0.9,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: const [
                   Logo(titulo: "Registro"),
                   _Form(),
-                  Labels(route:"login", isLogin: false),
+                  Labels(route: "login", isLogin: false),
                   Text("Terminos y condiciones de uso",
                       style: TextStyle(fontWeight: FontWeight.w200)),
                 ],
@@ -51,6 +54,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final socketProvider = Provider.of<SocketProvider>(context);
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -80,17 +84,18 @@ class __FormState extends State<_Form> {
                       //Elimina el focus del teclaro cuando mandamos.
                       FocusScope.of(context).unfocus();
                       final registerOk = await authProvider.register(
-                         nameCtrl.text.trim(), emailCtrl.text.trim(), passwordCtrl.text.trim());
-                      if (registerOk==true) {
-                        //Conectar al socket Server
+                          nameCtrl.text.trim(),
+                          emailCtrl.text.trim(),
+                          passwordCtrl.text.trim());
+                      if (registerOk == true) {
+                        socketProvider.connect();
                         Navigator.pushReplacementNamed(context, "usuarios");
                       } else {
                         alertaCredenciales(
                             context, "${registerOk}", "Revise credenciales");
                       }
                     }
-                  : null
-          )
+                  : null)
         ],
       ),
     );

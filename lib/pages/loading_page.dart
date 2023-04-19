@@ -6,6 +6,7 @@ import 'package:chat/providers/auth_provider.dart';
 import 'package:chat/pages/usuarios_page.dart';
 import 'package:chat/pages/login_page.dart';
 
+import '../providers/socket_provider.dart';
 
 class LoadingPage extends StatelessWidget {
   @override
@@ -24,18 +25,23 @@ class LoadingPage extends StatelessWidget {
 
   Future checkLoginState(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final socketProvider = Provider.of<SocketProvider>(context, listen: false);
     final autenticado = await authProvider.isLogged();
     if (autenticado!) {
-      //Conectar al socket server
+      socketProvider.connect();
       //Navigator.pushReplacementNamed(context, "usuarios");
-      Navigator.pushReplacement(context, PageRouteBuilder(
-        pageBuilder: (_,__,___)=>UsuariosPage(),
-      ));
-    } else{
-        Navigator.pushReplacement(context, PageRouteBuilder(
-        pageBuilder: (_,__,___)=>LoginPage(),
-      ));
+      Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => UsuariosPage(),
+          ));
+    } else {
+      Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => LoginPage(),
+          ));
     }
-      //Navigator.pushReplacementNamed(context, "login");
+    //Navigator.pushReplacementNamed(context, "login");
   }
 }

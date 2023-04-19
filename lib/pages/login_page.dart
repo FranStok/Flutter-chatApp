@@ -6,10 +6,13 @@ import 'package:chat/providers/auth_provider.dart';
 
 import 'package:chat/widgets/custom_inputs.dart';
 import 'package:chat/widgets/custom_elevated_btn.dart';
+import '../providers/socket_provider.dart';
 import '../widgets/custom_labels.dart';
 import '../widgets/custom_logo.dart';
 
 class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,6 +54,7 @@ class __FormState extends State<_Form> {
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final socketProvider = Provider.of<SocketProvider>(context);
     return Container(
       margin: const EdgeInsets.only(top: 40),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -77,15 +81,14 @@ class __FormState extends State<_Form> {
                       final loginOk = await authProvider.login(
                           emailCtrl.text.trim(), passwordCtrl.text.trim());
                       if (loginOk) {
-                        //Conectar al socket Server
+                        socketProvider.connect();
                         Navigator.pushReplacementNamed(context, "usuarios");
                       } else {
                         alertaCredenciales(
                             context, "Login incorrecto", "Revise credenciales");
                       }
                     }
-                  : null
-          )
+                  : null)
         ],
       ),
     );

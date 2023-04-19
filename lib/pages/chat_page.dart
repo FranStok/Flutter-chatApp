@@ -86,6 +86,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
     final Usuario receptor = chatProvider.receptor;
     return Scaffold(
       appBar: AppBar(
+          leading: IconButton(
+            icon:Icon(Icons.arrow_back_ios,color: Colors.black),
+            onPressed: (){
+              Navigator.pop(context);
+            }
+          ),
           backgroundColor: Colors.white,
           title: Column(
             children: [
